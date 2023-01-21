@@ -163,6 +163,23 @@ if __name__ == '__main__':
     Bupa Liver
     '''
 
+    bupa = bupa.drop(columns='selector')
+    bupa["drinks"] = pd.cut(bupa["drinks"], bins=[-1, 3, 20], labels=[0, 1])
+
+    feature_columns_bupa = ['mcv', 'alkphos', 'sgpt', 'sgot', 'gammagt']
+    x_bupa = bupa[feature_columns_bupa]
+    y_bupa = bupa['drinks'].values
+
+    x_train_bupa, x_test_bupa, y_train_bupa, y_test_bupa = train_test_split(x_bupa, y_bupa, test_size=0.2, random_state=0)
+
+    scaler = Normalizer().fit(x_train_bupa)
+    normalized_x_train_bupa = scaler.transform(x_train_bupa)
+    normalized_x_test_bupa = scaler.transform(x_test_bupa)
+
+    y_pred_bupa = class_based_knn(normalized_x_train_bupa, y_train_bupa, normalized_x_test_bupa)
+    accuracy_bupa = accuracy_score(y_test_bupa, y_pred_bupa)
+    print("Bupa Liver accuracy: %.2f" % accuracy_bupa)
+
     '''
     Pima Indians
     '''
@@ -254,4 +271,19 @@ if __name__ == '__main__':
     Boston Housing
     '''
 
+    hous["medv"] = pd.cut(hous["medv"], bins=[0, 15, 26, 38, 50], labels=[0, 1, 2, 3])
+    feature_columns_hous = ['crim', 'zn', 'indus', 'chas', 'nox', 'rm', 'age', 'dis', 'rad',
+                            'tax', 'ptratio', 'b', 'lstat']
+    x_hous = hous[feature_columns_hous]
+    y_hous = hous['medv'].values
+
+    x_train_hous, x_test_hous, y_train_hous, y_test_hous = train_test_split(x_hous, y_hous, test_size=0.2, random_state=0)
+
+    scaler = Normalizer().fit(x_train_hous)
+    normalized_x_train_hous = scaler.transform(x_train_hous)
+    normalized_x_test_hous = scaler.transform(x_test_hous)
+
+    y_pred_hous = class_based_knn(normalized_x_train_hous, y_train_hous, normalized_x_test_hous)
+    accuracy_hous = accuracy_score(y_test_hous, y_pred_hous)
+    print("Boston Housing accuracy: %.2f" % accuracy_hous)
 
