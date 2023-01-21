@@ -1,19 +1,12 @@
-import statistics
-
 import numpy as np
 import pandas as pd
-
-import matplotlib.pyplot as plt
-import seaborn as sns
-
-from sklearn import datasets
-from sklearn.model_selection import train_test_split , KFold
-from sklearn.preprocessing import Normalizer
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.metrics import confusion_matrix, accuracy_score
-from sklearn.model_selection import cross_val_score
+import statistics
 
 from collections import Counter, defaultdict
+
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import Normalizer
+from sklearn.metrics import accuracy_score
 
 import warnings
 warnings.filterwarnings('ignore')
@@ -21,11 +14,10 @@ warnings.filterwarnings('ignore')
 
 def euc_distance(x_train, x_test_point):
     """
-    Input:
-    - x_train: corresponding to the training data
-    - x_test_point: corresponding to the test point
-    Output:
-    -distances: The distances between the test point and each point in the training data.
+    Calculates Euclidean distance between points in n-dimensional space
+    :param x_train: corresponding to the training data
+    :param x_test_point: corresponding to the test point
+    :return: The distances between the test point and each point in the training data
     """
 
     distances = []                              # create empty list called distances
@@ -46,13 +38,11 @@ def euc_distance(x_train, x_test_point):
 
 def find_k(distance_point, y_train):
     """
-    Input:
-        -distance_point: the distances between the test point and each point in the training data.
-        -K             : the number of neighbors
-
-    Output:
-        -df_nearest: the nearest K neighbors between the test point and the training data.
-
+    Tests different values for k so the DC (Degree of Certainty) of the classification
+    is maximised for each test element
+    :param distance_point: the distances between the test point and each point in the training data
+    :param y_train: class values of the training data
+    :return: the K value that maximises the DC
     """
 
     k_dci_scores = defaultdict(int)
@@ -63,11 +53,8 @@ def find_k(distance_point, y_train):
         df_nearest = df_nearest[:test_k]
 
         counter_vote = Counter(y_train[df_nearest.index])
-        # print(counter_vote)
 
         max_counter_vote = max(counter_vote, key=counter_vote.get)
-        # print(max_counter_vote)
-
         max_classification_score = counter_vote[max_counter_vote]
 
         sum_classification_score = 0
@@ -75,24 +62,21 @@ def find_k(distance_point, y_train):
             sum_classification_score += counter_vote[i]
 
         dci = max_classification_score / sum_classification_score
-        # print(dci)
         k_dci_scores[test_k] = dci
 
-    # print(k_dci_scores)
     selected_k = max(k_dci_scores, key=k_dci_scores.get)
-    # print("K Selected: ", selected_k)
     return selected_k
 
 
 def prediction(distance_point, y_train, K):
     """
-    Input:
-        -df_nearest: dataframe contains the nearest K neighbors between the full training dataset and the test point.
-        -y_train: the labels of the training dataset.
-
-    Output:
-        -y_pred: the prediction based on Majority Voting
-
+    For every test element, the k nearest elements of each class are taken.
+    The harmonic mean of the distances of these neighbours is calculated.
+    These means are compared and the class yielding the lowest value is chosen for the classification.
+    :param distance_point: the distances between the test point and each point in the training data
+    :param y_train: class values of the training data
+    :param K: k nearest elements of each class are taken
+    :return: prediction
     """
 
     # Sort values using the sort_values function
@@ -105,16 +89,11 @@ def prediction(distance_point, y_train, K):
         class_values.append([])
     dist_harm_mean_class = defaultdict(int)
 
-    # print(class_values)
-    # print(df_nearest)
-
     for neigh in df_nearest.index:
         class_values[y_train[neigh]].append(neigh)
 
     for cl in classes:
-        # print("Class: ", cl)
         one_class_values = class_values[cl][:K]
-        # print(one_class_values)
 
         class_dist = []
         for val in one_class_values:
@@ -129,18 +108,14 @@ def prediction(distance_point, y_train, K):
 
 def class_based_knn(x_train, y_train, x_test):
     """
-    Input:
-    -x_train: the full training dataset
-    -y_train: the labels of the training dataset
-    -x_test: the full test dataset
-
-    Output:
-    -y_pred: the prediction for the whole test set based on Majority Voting.
+    Class Based kNN Classifier
+    :param x_train: the full training dataset
+    :param y_train: the classes of the training dataset
+    :param x_test: the full test dataset
+    :return: the prediction for the whole test set
     """
 
     y_pred = []
-
-    # Loop over all the test set and perform the three steps
     for x_test_point in x_test:
         distance_point = euc_distance(x_train, x_test_point)
         k = find_k(distance_point, y_train)
@@ -189,7 +164,7 @@ if __name__ == '__main__':
     x_pima = pima[feature_columns_pima]
     y_pima = pima['Outcome'].values
 
-    x_train_pima, x_test_pima, y_train_pima, y_test_pima = train_test_split(x_pima, y_pima, test_size=0.2, random_state=0)
+    x_train_pima, x_test_pima, y_train_pima, y_test_pima = train_test_split(x_pima, y_pima, test_size=0.1, random_state=0)
 
     scaler = Normalizer().fit(x_train_pima)              # the scaler is fitted to the training set
     normalized_x_train_pima = scaler.transform(x_train_pima)  # the scaler is applied to the training set
@@ -246,9 +221,7 @@ if __name__ == '__main__':
     Vehicle
     '''
 
-
     veh = veh.dropna()
-    # print(veh.apply(lambda s: pd.to_numeric(s, errors='coerce').notnull().all()))
     feature_columns_veh = ['Compactness', 'Circularity', 'DistanceCircularity', 'RadiusRatio', 'PRAxisAspectRatio',
                            'MaxLengthAspectRatio', 'ScatterRatio', 'Elongatedness', 'PRAxisRectangularity',
                            'MaxLengthRectangularity', 'ScaledVarianceMajor', 'ScaledVarianceMinor', 'ScaledRadius',
@@ -257,7 +230,7 @@ if __name__ == '__main__':
     veh['Class'] = veh['Class'].replace(['opel', 'saab', 'bus', 'van'], [0, 1, 2, 3])
     y_veh = veh['Class'].values
 
-    x_train_veh, x_test_veh, y_train_veh, y_test_veh = train_test_split(x_veh, y_veh, test_size=0.2, random_state=0)
+    x_train_veh, x_test_veh, y_train_veh, y_test_veh = train_test_split(x_veh, y_veh, test_size=0.1, random_state=0)
 
     scaler = Normalizer().fit(x_train_veh)
     normalized_x_train_veh = scaler.transform(x_train_veh)
@@ -265,7 +238,7 @@ if __name__ == '__main__':
 
     y_pred_veh = class_based_knn(normalized_x_train_veh, y_train_veh, normalized_x_test_veh)
     accuracy_veh = accuracy_score(y_test_veh, y_pred_veh)
-    print("Vehicle accuracy: %.2f" % accuracy_veh)
+    print("Vehicles accuracy: %.2f" % accuracy_veh)
 
     '''
     Boston Housing
@@ -277,7 +250,7 @@ if __name__ == '__main__':
     x_hous = hous[feature_columns_hous]
     y_hous = hous['medv'].values
 
-    x_train_hous, x_test_hous, y_train_hous, y_test_hous = train_test_split(x_hous, y_hous, test_size=0.2, random_state=0)
+    x_train_hous, x_test_hous, y_train_hous, y_test_hous = train_test_split(x_hous, y_hous, test_size=0.1, random_state=0)
 
     scaler = Normalizer().fit(x_train_hous)
     normalized_x_train_hous = scaler.transform(x_train_hous)
