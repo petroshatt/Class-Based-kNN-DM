@@ -156,76 +156,102 @@ if __name__ == '__main__':
     pima = pd.read_csv('datasets/pima-indians.csv')
     canc = pd.read_csv('datasets/breast-cancer-w.csv')
     heart = pd.read_csv('datasets/heart-disease.csv')
-    veh = pd.read_csv('datasets/vehicle.csv')
+    veh = pd.read_csv('datasets/vehicles.csv')
     hous = pd.read_csv('datasets/boston-housing.csv')
 
     '''
     Bupa Liver
     '''
 
-
-
-
     '''
     Pima Indians
     '''
 
-    # feature_columns_pima = ['Pregnancies', 'Glucose', 'BloodPressure', 'SkinThickness', 'Insulin', 'BMI',
-    #                         'DiabetesPedigreeFunction', 'Age']
-    # x_pima = pima[feature_columns_pima]
-    # y_pima = pima['Outcome'].values
-    #
-    # x_train_pima, x_test_pima, y_train_pima, y_test_pima = train_test_split(x_pima, y_pima, test_size=0.2, random_state=0)
-    #
-    # scaler = Normalizer().fit(x_train_pima)              # the scaler is fitted to the training set
-    # normalized_x_train_pima = scaler.transform(x_train_pima)  # the scaler is applied to the training set
-    # normalized_x_test_pima = scaler.transform(x_test_pima)    # the scaler is applied to the test set
-    #
-    # y_pred_pima = class_based_knn(normalized_x_train_pima, y_train_pima, normalized_x_test_pima)
-    # accuracy_pima = accuracy_score(y_test_pima, y_pred_pima)
-    # print("Pima Indians accuracy: %.2f" % accuracy_pima)
+    feature_columns_pima = ['Pregnancies', 'Glucose', 'BloodPressure', 'SkinThickness', 'Insulin', 'BMI',
+                            'DiabetesPedigreeFunction', 'Age']
+    x_pima = pima[feature_columns_pima]
+    y_pima = pima['Outcome'].values
+
+    x_train_pima, x_test_pima, y_train_pima, y_test_pima = train_test_split(x_pima, y_pima, test_size=0.2, random_state=0)
+
+    scaler = Normalizer().fit(x_train_pima)              # the scaler is fitted to the training set
+    normalized_x_train_pima = scaler.transform(x_train_pima)  # the scaler is applied to the training set
+    normalized_x_test_pima = scaler.transform(x_test_pima)    # the scaler is applied to the test set
+
+    y_pred_pima = class_based_knn(normalized_x_train_pima, y_train_pima, normalized_x_test_pima)
+    accuracy_pima = accuracy_score(y_test_pima, y_pred_pima)
+    print("Pima Indians accuracy: %.2f" % accuracy_pima)
 
     '''
     Breast Cancer
     '''
 
-    # feature_columns_canc = ['Sample code number', 'Clump Thickness', 'Uniformity of Cell Size', 'Uniformity of Cell Shape',
-    #                         'Marginal Adhesion', 'Single Epithelial Cell Size', 'Bland Chromatin', 'Normal Nucleoli', 'Mitoses']
-    # x_canc = canc[feature_columns_canc]
-    # canc['Class'] = canc['Class'].replace([2, 4], [0, 1])
-    # y_canc = canc['Class'].values
-    #
-    # x_train_canc, x_test_canc, y_train_canc, y_test_canc = train_test_split(x_canc, y_canc, test_size=0.2, random_state=0)
-    #
-    # scaler = Normalizer().fit(x_train_canc)
-    # normalized_x_train_canc = scaler.transform(x_train_canc)
-    # normalized_x_test_canc = scaler.transform(x_test_canc)
-    #
-    # y_pred_canc = class_based_knn(normalized_x_train_canc, y_train_canc, normalized_x_test_canc)
-    # accuracy_canc = accuracy_score(y_test_canc, y_pred_canc)
-    # print("Breast Cancer accuracy: %.2f" % accuracy_canc)
+    feature_columns_canc = ['Sample code number', 'Clump Thickness', 'Uniformity of Cell Size', 'Uniformity of Cell Shape',
+                            'Marginal Adhesion', 'Single Epithelial Cell Size', 'Bland Chromatin', 'Normal Nucleoli', 'Mitoses']
+    x_canc = canc[feature_columns_canc]
+    canc['Class'] = canc['Class'].replace([2, 4], [0, 1])
+    y_canc = canc['Class'].values
+
+    x_train_canc, x_test_canc, y_train_canc, y_test_canc = train_test_split(x_canc, y_canc, test_size=0.2, random_state=0)
+
+    scaler = Normalizer().fit(x_train_canc)
+    normalized_x_train_canc = scaler.transform(x_train_canc)
+    normalized_x_test_canc = scaler.transform(x_test_canc)
+
+    y_pred_canc = class_based_knn(normalized_x_train_canc, y_train_canc, normalized_x_test_canc)
+    accuracy_canc = accuracy_score(y_test_canc, y_pred_canc)
+    print("Breast Cancer accuracy: %.2f" % accuracy_canc)
 
     '''
     Heart Disease
     '''
 
-    # heart.drop(heart[heart['ca'] == "?"].index, inplace=True)
-    # heart.drop(heart[heart['thal'] == "?"].index, inplace=True)
-    #
-    # feature_columns_heart = ['age', 'sex', 'cp', 'trestbps', 'chol', 'fbs', 'restecg', 'thalach',
-    #                          'exang', 'oldpeak', 'slope', 'ca', 'thal']
-    # x_heart = heart[feature_columns_heart]
-    # heart['num'] = heart['num'].replace([1, 2, 3, 4], 1)
-    # y_heart = heart['num'].values
-    #
-    # x_train_heart, x_test_heart, y_train_heart, y_test_heart = train_test_split(x_heart, y_heart, test_size=0.2, random_state=0)
-    #
-    # scaler = Normalizer().fit(x_train_heart)
-    # normalized_x_train_heart = scaler.transform(x_train_heart)
-    # normalized_x_test_heart = scaler.transform(x_test_heart)
-    #
-    # y_pred_heart = class_based_knn(normalized_x_train_heart, y_train_heart, normalized_x_test_heart)
-    # accuracy_heart = accuracy_score(y_test_heart, y_pred_heart)
-    # print("Heart Disease accuracy: %.2f" % accuracy_heart)
+    heart.drop(heart[heart['ca'] == "?"].index, inplace=True)
+    heart.drop(heart[heart['thal'] == "?"].index, inplace=True)
+
+    feature_columns_heart = ['age', 'sex', 'cp', 'trestbps', 'chol', 'fbs', 'restecg', 'thalach',
+                             'exang', 'oldpeak', 'slope', 'ca', 'thal']
+    x_heart = heart[feature_columns_heart]
+    heart['num'] = heart['num'].replace([1, 2, 3, 4], 1)
+    y_heart = heart['num'].values
+
+    x_train_heart, x_test_heart, y_train_heart, y_test_heart = train_test_split(x_heart, y_heart, test_size=0.2, random_state=0)
+
+    scaler = Normalizer().fit(x_train_heart)
+    normalized_x_train_heart = scaler.transform(x_train_heart)
+    normalized_x_test_heart = scaler.transform(x_test_heart)
+
+    y_pred_heart = class_based_knn(normalized_x_train_heart, y_train_heart, normalized_x_test_heart)
+    accuracy_heart = accuracy_score(y_test_heart, y_pred_heart)
+    print("Heart Disease accuracy: %.2f" % accuracy_heart)
+
+    '''
+    Vehicle
+    '''
+
+
+    veh = veh.dropna()
+    # print(veh.apply(lambda s: pd.to_numeric(s, errors='coerce').notnull().all()))
+    feature_columns_veh = ['Compactness', 'Circularity', 'DistanceCircularity', 'RadiusRatio', 'PRAxisAspectRatio',
+                           'MaxLengthAspectRatio', 'ScatterRatio', 'Elongatedness', 'PRAxisRectangularity',
+                           'MaxLengthRectangularity', 'ScaledVarianceMajor', 'ScaledVarianceMinor', 'ScaledRadius',
+                           'SkewnessMajor', 'SkewnessMinor', 'KurtosisMinor', 'KurtosisMajor', 'HollowsRatio']
+    x_veh = veh[feature_columns_veh]
+    veh['Class'] = veh['Class'].replace(['opel', 'saab', 'bus', 'van'], [0, 1, 2, 3])
+    y_veh = veh['Class'].values
+
+    x_train_veh, x_test_veh, y_train_veh, y_test_veh = train_test_split(x_veh, y_veh, test_size=0.2, random_state=0)
+
+    scaler = Normalizer().fit(x_train_veh)
+    normalized_x_train_veh = scaler.transform(x_train_veh)
+    normalized_x_test_veh = scaler.transform(x_test_veh)
+
+    y_pred_veh = class_based_knn(normalized_x_train_veh, y_train_veh, normalized_x_test_veh)
+    accuracy_veh = accuracy_score(y_test_veh, y_pred_veh)
+    print("Vehicle accuracy: %.2f" % accuracy_veh)
+
+    '''
+    Boston Housing
+    '''
 
 
