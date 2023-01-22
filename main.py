@@ -4,7 +4,7 @@ import statistics
 
 from collections import Counter, defaultdict
 
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, KFold, cross_val_score, RepeatedKFold
 from sklearn.preprocessing import Normalizer
 from sklearn.metrics import accuracy_score
 
@@ -47,7 +47,7 @@ def find_k(distance_point, y_train):
 
     k_dci_scores = defaultdict(int)
 
-    for test_k in range(3, 20, 2):
+    for test_k in range(3, 35):
 
         df_nearest = distance_point.sort_values(by=['dist'], axis=0)
         df_nearest = df_nearest[:test_k]
@@ -145,15 +145,24 @@ if __name__ == '__main__':
     x_bupa = bupa[feature_columns_bupa]
     y_bupa = bupa['drinks'].values
 
-    x_train_bupa, x_test_bupa, y_train_bupa, y_test_bupa = train_test_split(x_bupa, y_bupa, test_size=0.2, random_state=0)
+    kf = KFold(n_splits=10, random_state=4, shuffle=True)
+    acc_scores = []
 
-    scaler = Normalizer().fit(x_train_bupa)
-    normalized_x_train_bupa = scaler.transform(x_train_bupa)
-    normalized_x_test_bupa = scaler.transform(x_test_bupa)
+    for train_index, test_index in kf.split(x_bupa):
+        x_train_bupa, x_test_bupa = x_bupa.iloc[train_index, :], x_bupa.iloc[test_index, :]
+        y_train_bupa, y_test_bupa = y_bupa[train_index], y_bupa[test_index]
 
-    y_pred_bupa = class_based_knn(normalized_x_train_bupa, y_train_bupa, normalized_x_test_bupa)
-    accuracy_bupa = accuracy_score(y_test_bupa, y_pred_bupa)
-    print("Bupa Liver accuracy: %.2f" % accuracy_bupa)
+        scaler = Normalizer().fit(x_train_bupa)
+        normalized_x_train_bupa = scaler.transform(x_train_bupa)
+        normalized_x_test_bupa = scaler.transform(x_test_bupa)
+
+        y_pred_bupa = class_based_knn(normalized_x_train_bupa, y_train_bupa, normalized_x_test_bupa)
+        accuracy_bupa = accuracy_score(y_test_bupa, y_pred_bupa)
+        acc_scores.append(accuracy_bupa)
+        # print("Bupa Liver Accuracy: %.2f" % accuracy_bupa)
+
+    avg_acc_score = sum(acc_scores) / 10
+    print("Bupa Liver Accuracy: %.2f" % avg_acc_score)
 
     '''
     Pima Indians
@@ -164,15 +173,24 @@ if __name__ == '__main__':
     x_pima = pima[feature_columns_pima]
     y_pima = pima['Outcome'].values
 
-    x_train_pima, x_test_pima, y_train_pima, y_test_pima = train_test_split(x_pima, y_pima, test_size=0.1, random_state=0)
+    kf = KFold(n_splits=10, random_state=4, shuffle=True)
+    acc_scores = []
 
-    scaler = Normalizer().fit(x_train_pima)              # the scaler is fitted to the training set
-    normalized_x_train_pima = scaler.transform(x_train_pima)  # the scaler is applied to the training set
-    normalized_x_test_pima = scaler.transform(x_test_pima)    # the scaler is applied to the test set
+    for train_index, test_index in kf.split(x_pima):
+        x_train_pima, x_test_pima = x_pima.iloc[train_index, :], x_pima.iloc[test_index, :]
+        y_train_pima, y_test_pima = y_pima[train_index], y_pima[test_index]
 
-    y_pred_pima = class_based_knn(normalized_x_train_pima, y_train_pima, normalized_x_test_pima)
-    accuracy_pima = accuracy_score(y_test_pima, y_pred_pima)
-    print("Pima Indians accuracy: %.2f" % accuracy_pima)
+        scaler = Normalizer().fit(x_train_pima)
+        normalized_x_train_pima = scaler.transform(x_train_pima)
+        normalized_x_test_pima = scaler.transform(x_test_pima)
+
+        y_pred_pima = class_based_knn(normalized_x_train_pima, y_train_pima, normalized_x_test_pima)
+        accuracy_pima = accuracy_score(y_test_pima, y_pred_pima)
+        acc_scores.append(accuracy_pima)
+        # print("Pima Indians Accuracy: %.2f" % accuracy_pima)
+
+    avg_acc_score = sum(acc_scores) / 10
+    print("Pima Indians Accuracy: %.2f" % avg_acc_score)
 
     '''
     Breast Cancer
@@ -184,15 +202,24 @@ if __name__ == '__main__':
     canc['Class'] = canc['Class'].replace([2, 4], [0, 1])
     y_canc = canc['Class'].values
 
-    x_train_canc, x_test_canc, y_train_canc, y_test_canc = train_test_split(x_canc, y_canc, test_size=0.2, random_state=0)
+    kf = KFold(n_splits=10, random_state=4, shuffle=True)
+    acc_scores = []
 
-    scaler = Normalizer().fit(x_train_canc)
-    normalized_x_train_canc = scaler.transform(x_train_canc)
-    normalized_x_test_canc = scaler.transform(x_test_canc)
+    for train_index, test_index in kf.split(x_canc):
+        x_train_canc, x_test_canc = x_canc.iloc[train_index, :], x_canc.iloc[test_index, :]
+        y_train_canc, y_test_canc = y_canc[train_index], y_canc[test_index]
 
-    y_pred_canc = class_based_knn(normalized_x_train_canc, y_train_canc, normalized_x_test_canc)
-    accuracy_canc = accuracy_score(y_test_canc, y_pred_canc)
-    print("Breast Cancer accuracy: %.2f" % accuracy_canc)
+        scaler = Normalizer().fit(x_train_canc)
+        normalized_x_train_canc = scaler.transform(x_train_canc)
+        normalized_x_test_canc = scaler.transform(x_test_canc)
+
+        y_pred_canc = class_based_knn(normalized_x_train_canc, y_train_canc, normalized_x_test_canc)
+        accuracy_canc = accuracy_score(y_test_canc, y_pred_canc)
+        acc_scores.append(accuracy_canc)
+        # print("Breast Cancer Accuracy: %.2f" % accuracy_canc)
+
+    avg_acc_score = sum(acc_scores) / 10
+    print("Breast Cancer Accuracy: %.2f" % avg_acc_score)
 
     '''
     Heart Disease
@@ -207,15 +234,24 @@ if __name__ == '__main__':
     heart['num'] = heart['num'].replace([1, 2, 3, 4], 1)
     y_heart = heart['num'].values
 
-    x_train_heart, x_test_heart, y_train_heart, y_test_heart = train_test_split(x_heart, y_heart, test_size=0.2, random_state=0)
+    kf = KFold(n_splits=10, random_state=7, shuffle=True)
+    acc_scores = []
 
-    scaler = Normalizer().fit(x_train_heart)
-    normalized_x_train_heart = scaler.transform(x_train_heart)
-    normalized_x_test_heart = scaler.transform(x_test_heart)
+    for train_index, test_index in kf.split(x_heart):
+        x_train_heart, x_test_heart = x_heart.iloc[train_index, :], x_heart.iloc[test_index, :]
+        y_train_heart, y_test_heart = y_heart[train_index], y_heart[test_index]
 
-    y_pred_heart = class_based_knn(normalized_x_train_heart, y_train_heart, normalized_x_test_heart)
-    accuracy_heart = accuracy_score(y_test_heart, y_pred_heart)
-    print("Heart Disease accuracy: %.2f" % accuracy_heart)
+        scaler = Normalizer().fit(x_train_heart)
+        normalized_x_train_heart = scaler.transform(x_train_heart)
+        normalized_x_test_heart = scaler.transform(x_test_heart)
+
+        y_pred_heart = class_based_knn(normalized_x_train_heart, y_train_heart, normalized_x_test_heart)
+        accuracy_heart = accuracy_score(y_test_heart, y_pred_heart)
+        acc_scores.append(accuracy_heart)
+        # print("Heart Disease Accuracy: %.2f" % accuracy_heart)
+
+    avg_acc_score = sum(acc_scores) / 10
+    print("Heart Disease Accuracy: %.2f" % avg_acc_score)
 
     '''
     Vehicle
@@ -230,15 +266,25 @@ if __name__ == '__main__':
     veh['Class'] = veh['Class'].replace(['opel', 'saab', 'bus', 'van'], [0, 1, 2, 3])
     y_veh = veh['Class'].values
 
-    x_train_veh, x_test_veh, y_train_veh, y_test_veh = train_test_split(x_veh, y_veh, test_size=0.1, random_state=0)
+    kf = KFold(n_splits=10, random_state=4, shuffle=True)
+    acc_scores = []
 
-    scaler = Normalizer().fit(x_train_veh)
-    normalized_x_train_veh = scaler.transform(x_train_veh)
-    normalized_x_test_veh = scaler.transform(x_test_veh)
+    for train_index, test_index in kf.split(x_veh):
+        x_train_veh, x_test_veh = x_veh.iloc[train_index, :], x_veh.iloc[test_index, :]
+        y_train_veh, y_test_veh = y_veh[train_index], y_veh[test_index]
 
-    y_pred_veh = class_based_knn(normalized_x_train_veh, y_train_veh, normalized_x_test_veh)
-    accuracy_veh = accuracy_score(y_test_veh, y_pred_veh)
-    print("Vehicles accuracy: %.2f" % accuracy_veh)
+        scaler = Normalizer().fit(x_train_veh)
+        normalized_x_train_veh = scaler.transform(x_train_veh)
+        normalized_x_test_veh = scaler.transform(x_test_veh)
+
+        y_pred_veh = class_based_knn(normalized_x_train_veh, y_train_veh, normalized_x_test_veh)
+        accuracy_veh = accuracy_score(y_test_veh, y_pred_veh)
+        acc_scores.append(accuracy_veh)
+        # print("Vehicles Accuracy: %.2f" % accuracy_veh)
+
+    avg_acc_score = sum(acc_scores) / 10
+    print("Vehicles Accuracy: %.2f" % avg_acc_score)
+
 
     '''
     Boston Housing
@@ -250,13 +296,21 @@ if __name__ == '__main__':
     x_hous = hous[feature_columns_hous]
     y_hous = hous['medv'].values
 
-    x_train_hous, x_test_hous, y_train_hous, y_test_hous = train_test_split(x_hous, y_hous, test_size=0.1, random_state=0)
+    kf = KFold(n_splits=10, random_state=6, shuffle=True)
+    acc_scores = []
 
-    scaler = Normalizer().fit(x_train_hous)
-    normalized_x_train_hous = scaler.transform(x_train_hous)
-    normalized_x_test_hous = scaler.transform(x_test_hous)
+    for train_index, test_index in kf.split(x_hous):
+        x_train_hous, x_test_hous = x_hous.iloc[train_index, :], x_hous.iloc[test_index, :]
+        y_train_hous, y_test_hous = y_hous[train_index], y_hous[test_index]
 
-    y_pred_hous = class_based_knn(normalized_x_train_hous, y_train_hous, normalized_x_test_hous)
-    accuracy_hous = accuracy_score(y_test_hous, y_pred_hous)
-    print("Boston Housing accuracy: %.2f" % accuracy_hous)
+        scaler = Normalizer().fit(x_train_hous)
+        normalized_x_train_hous = scaler.transform(x_train_hous)
+        normalized_x_test_hous = scaler.transform(x_test_hous)
 
+        y_pred_hous = class_based_knn(normalized_x_train_hous, y_train_hous, normalized_x_test_hous)
+        accuracy_hous = accuracy_score(y_test_hous, y_pred_hous)
+        acc_scores.append(accuracy_hous)
+        # print("Boston Housing Accuracy: %.2f" % accuracy_hous)
+
+    avg_acc_score = sum(acc_scores) / 10
+    print("Boston Housing Accuracy: %.2f" % avg_acc_score)
