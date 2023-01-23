@@ -4,12 +4,11 @@ import statistics
 
 from collections import Counter, defaultdict
 
-from sklearn.model_selection import train_test_split, KFold, cross_val_score, RepeatedKFold
+from sklearn.model_selection import KFold
 from sklearn.preprocessing import Normalizer
 from sklearn.metrics import accuracy_score
 
 import warnings
-
 warnings.filterwarnings('ignore')
 
 
@@ -78,7 +77,7 @@ def prediction(distance_point, y_train, K):
     classes = np.unique(y_train)
     class_values = []
 
-    for cl in classes:
+    for cl in range(len(classes)):
         class_values.append([])
     dist_harm_mean_class = defaultdict(int)
 
