@@ -47,7 +47,7 @@ def find_k(distance_point, y_train):
     k_dci_scores = defaultdict(int)
     df_nearest = distance_point.sort_values(by=['dist'], axis=0)
 
-    for test_k in range(3, 35):
+    for test_k in range(3, 36):
         df_nearest_firstk = df_nearest[:test_k]
 
         counter_vote = Counter(y_train[df_nearest_firstk.index])
