@@ -46,22 +46,17 @@ def find_k(distance_point, y_train):
     """
 
     k_dci_scores = defaultdict(int)
+    df_nearest = distance_point.sort_values(by=['dist'], axis=0)
 
     for test_k in range(3, 35):
 
-        df_nearest = distance_point.sort_values(by=['dist'], axis=0)
-        df_nearest = df_nearest[:test_k]
+        df_nearest_firstk = df_nearest[:test_k]
 
-        counter_vote = Counter(y_train[df_nearest.index])
-
+        counter_vote = Counter(y_train[df_nearest_firstk.index])
         max_counter_vote = max(counter_vote, key=counter_vote.get)
         max_classification_score = counter_vote[max_counter_vote]
 
-        sum_classification_score = 0
-        for i in set(y_train):
-            sum_classification_score += counter_vote[i]
-
-        dci = max_classification_score / sum_classification_score
+        dci = max_classification_score / test_k
         k_dci_scores[test_k] = dci
 
     selected_k = max(k_dci_scores, key=k_dci_scores.get)
@@ -79,7 +74,6 @@ def prediction(distance_point, y_train, K):
     :return: prediction
     """
 
-    # Sort values using the sort_values function
     df_nearest = distance_point.sort_values(by=['dist'], axis=0)
 
     classes = np.unique(y_train)
@@ -290,7 +284,8 @@ if __name__ == '__main__':
     Boston Housing
     '''
 
-    hous["medv"] = pd.cut(hous["medv"], bins=[0, 15, 26, 38, 50], labels=[0, 1, 2, 3])
+    # hous["medv"] = pd.cut(hous["medv"], bins=[0, 15, 26, 38, 50], labels=[0, 1, 2, 3])
+    hous["medv"] = pd.cut(hous["medv"], bins=[0, 17, 33, 50], labels=[0, 1, 2])
     feature_columns_hous = ['crim', 'zn', 'indus', 'chas', 'nox', 'rm', 'age', 'dis', 'rad',
                             'tax', 'ptratio', 'b', 'lstat']
     x_hous = hous[feature_columns_hous]
