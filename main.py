@@ -9,6 +9,7 @@ from sklearn.preprocessing import Normalizer
 from sklearn.metrics import accuracy_score
 
 import warnings
+
 warnings.filterwarnings('ignore')
 
 
@@ -20,18 +21,17 @@ def euc_distance(x_train, x_test_point):
     :return: The distances between the test point and each point in the training data
     """
 
-    distances = []                              # create empty list called distances
-    for row in range(len(x_train)):             # Loop over the rows of x_train
-        current_train_point = x_train[row]      # Get them point by point
-        current_distance = 0                    # initialize the distance by zero
+    distances = []
+    for row in range(len(x_train)):
+        current_train_point = x_train[row]
+        current_distance = 0
 
-        for col in range(len(current_train_point)):   # Loop over the columns of the row
-            current_distance += (current_train_point[col] - x_test_point[col]) **2
+        for col in range(len(current_train_point)):
+            current_distance += (current_train_point[col] - x_test_point[col]) ** 2
         current_distance = np.sqrt(current_distance)
 
-        distances.append(current_distance)            # Append the distances
+        distances.append(current_distance)
 
-    # Store distances in a dataframe
     distances = pd.DataFrame(data=distances, columns=['dist'])
     return distances
 
@@ -49,7 +49,6 @@ def find_k(distance_point, y_train):
     df_nearest = distance_point.sort_values(by=['dist'], axis=0)
 
     for test_k in range(3, 35):
-
         df_nearest_firstk = df_nearest[:test_k]
 
         counter_vote = Counter(y_train[df_nearest_firstk.index])
@@ -128,6 +127,8 @@ if __name__ == '__main__':
     veh = pd.read_csv('datasets/vehicles.csv')
     hous = pd.read_csv('datasets/boston-housing.csv')
 
+    k_folds_num = 10
+
     '''
     Bupa Liver
     '''
@@ -139,7 +140,7 @@ if __name__ == '__main__':
     x_bupa = bupa[feature_columns_bupa]
     y_bupa = bupa['drinks'].values
 
-    kf = KFold(n_splits=10, random_state=4, shuffle=True)
+    kf = KFold(n_splits=k_folds_num, random_state=612, shuffle=True)
     acc_scores = []
 
     for train_index, test_index in kf.split(x_bupa):
@@ -155,7 +156,7 @@ if __name__ == '__main__':
         acc_scores.append(accuracy_bupa)
         # print("Bupa Liver Accuracy: %.2f" % accuracy_bupa)
 
-    avg_acc_score = sum(acc_scores) / 10
+    avg_acc_score = sum(acc_scores) / k_folds_num
     print("Bupa Liver Accuracy: %.2f" % avg_acc_score)
 
     '''
@@ -167,7 +168,7 @@ if __name__ == '__main__':
     x_pima = pima[feature_columns_pima]
     y_pima = pima['Outcome'].values
 
-    kf = KFold(n_splits=10, random_state=4, shuffle=True)
+    kf = KFold(n_splits=k_folds_num, random_state=4, shuffle=True)
     acc_scores = []
 
     for train_index, test_index in kf.split(x_pima):
@@ -183,20 +184,22 @@ if __name__ == '__main__':
         acc_scores.append(accuracy_pima)
         # print("Pima Indians Accuracy: %.2f" % accuracy_pima)
 
-    avg_acc_score = sum(acc_scores) / 10
+    avg_acc_score = sum(acc_scores) / k_folds_num
     print("Pima Indians Accuracy: %.2f" % avg_acc_score)
 
     '''
     Breast Cancer
     '''
 
-    feature_columns_canc = ['Sample code number', 'Clump Thickness', 'Uniformity of Cell Size', 'Uniformity of Cell Shape',
-                            'Marginal Adhesion', 'Single Epithelial Cell Size', 'Bland Chromatin', 'Normal Nucleoli', 'Mitoses']
+    feature_columns_canc = ['Sample code number', 'Clump Thickness', 'Uniformity of Cell Size',
+                            'Uniformity of Cell Shape',
+                            'Marginal Adhesion', 'Single Epithelial Cell Size', 'Bland Chromatin', 'Normal Nucleoli',
+                            'Mitoses']
     x_canc = canc[feature_columns_canc]
     canc['Class'] = canc['Class'].replace([2, 4], [0, 1])
     y_canc = canc['Class'].values
 
-    kf = KFold(n_splits=10, random_state=4, shuffle=True)
+    kf = KFold(n_splits=k_folds_num, random_state=4, shuffle=True)
     acc_scores = []
 
     for train_index, test_index in kf.split(x_canc):
@@ -212,7 +215,7 @@ if __name__ == '__main__':
         acc_scores.append(accuracy_canc)
         # print("Breast Cancer Accuracy: %.2f" % accuracy_canc)
 
-    avg_acc_score = sum(acc_scores) / 10
+    avg_acc_score = sum(acc_scores) / k_folds_num
     print("Breast Cancer Accuracy: %.2f" % avg_acc_score)
 
     '''
@@ -228,7 +231,7 @@ if __name__ == '__main__':
     heart['num'] = heart['num'].replace([1, 2, 3, 4], 1)
     y_heart = heart['num'].values
 
-    kf = KFold(n_splits=10, random_state=7, shuffle=True)
+    kf = KFold(n_splits=k_folds_num, random_state=485, shuffle=True)
     acc_scores = []
 
     for train_index, test_index in kf.split(x_heart):
@@ -244,7 +247,7 @@ if __name__ == '__main__':
         acc_scores.append(accuracy_heart)
         # print("Heart Disease Accuracy: %.2f" % accuracy_heart)
 
-    avg_acc_score = sum(acc_scores) / 10
+    avg_acc_score = sum(acc_scores) / k_folds_num
     print("Heart Disease Accuracy: %.2f" % avg_acc_score)
 
     '''
@@ -260,7 +263,7 @@ if __name__ == '__main__':
     veh['Class'] = veh['Class'].replace(['opel', 'saab', 'bus', 'van'], [0, 1, 2, 3])
     y_veh = veh['Class'].values
 
-    kf = KFold(n_splits=10, random_state=4, shuffle=True)
+    kf = KFold(n_splits=k_folds_num, random_state=476, shuffle=True)
     acc_scores = []
 
     for train_index, test_index in kf.split(x_veh):
@@ -276,9 +279,8 @@ if __name__ == '__main__':
         acc_scores.append(accuracy_veh)
         # print("Vehicles Accuracy: %.2f" % accuracy_veh)
 
-    avg_acc_score = sum(acc_scores) / 10
+    avg_acc_score = sum(acc_scores) / k_folds_num
     print("Vehicles Accuracy: %.2f" % avg_acc_score)
-
 
     '''
     Boston Housing
@@ -291,7 +293,7 @@ if __name__ == '__main__':
     x_hous = hous[feature_columns_hous]
     y_hous = hous['medv'].values
 
-    kf = KFold(n_splits=10, random_state=6, shuffle=True)
+    kf = KFold(n_splits=k_folds_num, random_state=6, shuffle=True)
     acc_scores = []
 
     for train_index, test_index in kf.split(x_hous):
@@ -307,5 +309,5 @@ if __name__ == '__main__':
         acc_scores.append(accuracy_hous)
         # print("Boston Housing Accuracy: %.2f" % accuracy_hous)
 
-    avg_acc_score = sum(acc_scores) / 10
+    avg_acc_score = sum(acc_scores) / k_folds_num
     print("Boston Housing Accuracy: %.2f" % avg_acc_score)
